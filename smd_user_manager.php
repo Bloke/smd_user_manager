@@ -615,7 +615,7 @@ function smd_um($msg='') {
     $btnbar = smd_um_buttons('usr');
 
     echo '<h1 class="txp-heading">', gTxt('smd_um_heading_usr'), '</h1>',
-        '<div id="', $smd_um_event, '_control" class="txp-control-panel">',
+        '<div class="clearfix" id="', $smd_um_event, '_control" class="txp-control-panel">',
         $btnbar;
 
     if ($total < 1) {
@@ -765,7 +765,7 @@ function smd_um_edit($msg='') {
     $btnbar = smd_um_buttons('usr');
 
     echo '<h1 class="txp-heading">', $caption, '</h1>',
-        n, '<div id="', $smd_um_event, '_control" class="txp-control-panel">',
+        n, '<div class="clearfix" id="', $smd_um_event, '_control" class="txp-control-panel">',
         n, $btnbar,
         n, '</div>',
         n, '<div id="', $smd_um_event.'_container" class="txp-edit">',
@@ -975,7 +975,7 @@ function smd_um_groups($msg='') {
 
     // New group
     echo '<h1 class="txp-heading">', gTxt('smd_um_heading_grp'), '</h1>',
-        n, '<div id="'.$smd_um_event.'_control" class="txp-control-panel">',
+        n, '<div class="clearfix" id="'.$smd_um_event.'_control" class="txp-control-panel">',
         n, $btnbar,
         n, form(
             graf(
@@ -1130,7 +1130,7 @@ function smd_um_privs($msg='') {
     $btnbar = smd_um_buttons('prv');
 
     echo '<h1 class="txp-heading">', gTxt('smd_um_heading_prv'), '</h1>',
-        n, '<div id="'.$smd_um_event.'_control" class="txp-control-panel">',
+        n, '<div class="clearfix" id="'.$smd_um_event.'_control" class="txp-control-panel">',
         n, $btnbar,
         n, form(
             graf(
@@ -1342,7 +1342,7 @@ function smd_um_prefs($msg='') {
     $btnbar = smd_um_buttons('prf');
 
     echo '<h1 class="txp-heading">', gTxt('smd_um_heading_prf'), '</h1>',
-        n, '<div id="', $smd_um_event, '_control" class="txp-control-panel">', $btnbar, '</div>';
+        n, '<div class="clearfix" id="', $smd_um_event, '_control" class="txp-control-panel">', $btnbar, '</div>';
 
     $out = array();
     $out[] = n.'<div class="plugin-column">';
