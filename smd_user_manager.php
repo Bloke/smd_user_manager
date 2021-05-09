@@ -391,30 +391,35 @@ class smd_um
     {
         global $event, $txp_user, $step;
 
-        add_privs('plugin_prefs.smd_user_manager', '1');
-        add_privs('prefs.smd_user_manager', '1');
-        add_privs($this->event.'.smd_um_grp', '1');
-        add_privs($this->event.'.smd_um_prv', '1');
+        if ($event === 'prefs') {
+            add_privs('prefs.smd_user_manager', '1');
+            $has_cb = callback_handlers('admin_side', 'footer');
 
-        register_callback(array($this, 'steps'), 'user', 'steps');
-        register_callback(array($this, 'install'), 'plugin_lifecycle.smd_user_manager');
-        register_callback(array($this, 'options'), 'plugin_prefs.smd_user_manager', null, 1);
+            if (!in_array(__CLASS__.'->active_users', $has_cb)) {
+                register_callback(array($this, 'active_users'), 'admin_side', 'footer');
+            }
+        } else {
+            add_privs('plugin_prefs.smd_user_manager', '1');
+            add_privs($this->event.'.smd_um_grp', '1');
+            add_privs($this->event.'.smd_um_prv', '1');
+            register_callback(array($this, 'steps'), 'user', 'steps');
+            register_callback(array($this, 'options'), 'plugin_prefs.smd_user_manager', null, 1);
+            register_callback(array($this, 'active_users'), 'admin_side', 'footer');
+            register_callback(array($this, 'searchMethods'), 'search_criteria', 'admin');
+            register_callback(array($this, 'buttons'), 'user', 'controls', 'panel');
+            register_callback(array($this, 'listHandler'), 'user', null, 'list');
+            register_callback(array($this, 'listRow'), 'user_ui', 'list.row');
+            register_callback(array($this, 'groups'), 'admin', 'smd_um_groups', 1);
+            register_callback(array($this, 'group_add'), 'admin', 'smd_um_group_add', 1);
+            register_callback(array($this, 'group_del'), 'admin', 'smd_um_group_del', 1);
+            register_callback(array($this, 'group_save'), 'admin', 'smd_um_group_save', 1);
+            register_callback(array($this, 'privs'), 'admin', 'smd_um_privs', 1);
+            register_callback(array($this, 'priv_add'), 'admin', 'smd_um_priv_add', 1);
+            register_callback(array($this, 'priv_save'), 'admin', 'smd_um_priv_save', 1);
+        }
 
-        register_callback(array($this, 'prefs'), 'plugin_prefs.smd_user_manager');
         register_callback(array($this, 'welcome'), 'plugin_lifecycle.smd_user_manager');
         register_callback(array($this, 'inject_css'), 'admin_side', 'head_end');
-        register_callback(array($this, 'active_users'), 'admin_side', 'footer');
-        register_callback(array($this, 'searchMethods'), 'search_criteria', 'admin');
-        register_callback(array($this, 'buttons'), 'user', 'controls', 'panel');
-        register_callback(array($this, 'listHandler'), 'user', null, 'list');
-        register_callback(array($this, 'listRow'), 'user_ui', 'list.row');
-        register_callback(array($this, 'groups'), 'admin', 'smd_um_groups', 1);
-        register_callback(array($this, 'group_add'), 'admin', 'smd_um_group_add', 1);
-        register_callback(array($this, 'group_del'), 'admin', 'smd_um_group_del', 1);
-        register_callback(array($this, 'group_save'), 'admin', 'smd_um_group_save', 1);
-        register_callback(array($this, 'privs'), 'admin', 'smd_um_privs', 1);
-        register_callback(array($this, 'priv_add'), 'admin', 'smd_um_priv_add', 1);
-        register_callback(array($this, 'priv_save'), 'admin', 'smd_um_priv_save', 1);
 
         // Call the installer in case the lifecycle event didn't fire.
         $this->install();
