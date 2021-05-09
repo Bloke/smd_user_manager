@@ -464,7 +464,6 @@ class smd_um
 .smd_um_privgroup { position:relative; }
 .smd_um_privgroup h3 { text-align:left; font-weight:bold; }
 .smd_um_privsave { position:absolute; left:25px; top:2rem; }
-.smd_um_active_users { margin:15px auto; width:80%; text-align:center; }
 .smd_um_selected { background-color:#e2dfce; }
 .smd_um_grp_name, .smd_um_prv_name, .smd_um_reset_col { cursor:pointer; }
 .smd_um_checkbox, .smd_um_prv_hdr { text-align:center!important; }
@@ -1288,7 +1287,7 @@ EOJS
     {
         $smd_um_prefs = $this->get_prefs();
 
-        $curr_users = json_decode(get_pref('smd_um_current_users', '', 1));
+        $curr_users = json_decode(get_pref('smd_um_current_users', '', 1), true);
         $timeout = get_pref('smd_um_active_timeout', $smd_um_prefs['smd_um_active_timeout']['default']);
         $online = array();
 
@@ -1297,15 +1296,15 @@ EOJS
                 $still_active = strtotime("+$timeout seconds", $last_access);
 
                 if (($still_active !== false) && ($still_active > time())) {
-                    $online[] = eLink($this->event, '', 'search_method', 'login_name', $user, 'crit', $user);
+                    $online[] = eLink($this->event, '', 'search_method', 'login', $user, 'crit', $user);
                 }
             }
         }
 
-        return ($online)
-            ? graf(gTxt('smd_um_active', array('{users}' => implode(', ', $online))),
+        return (($online)
+            ? graf(gTxt('smd_um_active', array('{users}' => implode(', ', $online)), 'raw'),
                 array('class' => 'smd_um_active_users'))
-            : '';
+            : '').$data;
     }
 
     /**
