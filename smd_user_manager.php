@@ -376,6 +376,13 @@ class smd_um
     protected $version = '0.3.0';
 
     /**
+     * The plugin's privileges.
+     *
+     * @var string
+     */
+    protected $privs = '1';
+
+    /**
      * Any UI message to announce.
      *
      * @var string
@@ -392,11 +399,11 @@ class smd_um
         global $event, $txp_user, $step;
 
         if ($event === 'prefs') {
-            add_privs('prefs.smd_user_manager', '1');
+            add_privs('prefs.smd_user_manager', $this->privs);
         } elseif ($event === $this->event) {
-            add_privs('plugin_prefs.smd_user_manager', '1');
-            add_privs($this->event.'.smd_um_grp', '1');
-            add_privs($this->event.'.smd_um_prv', '1');
+            add_privs('plugin_prefs.smd_user_manager', $this->privs);
+            add_privs($this->event.'.smd_um_grp', $this->privs);
+            add_privs($this->event.'.smd_um_prv', $this->privs);
             register_callback(array($this, 'steps'), 'user', 'steps');
             register_callback(array($this, 'searchMethods'), 'search_criteria', 'admin');
             register_callback(array($this, 'buttons'), 'user', 'controls', 'panel');
@@ -411,12 +418,13 @@ class smd_um
             register_callback(array($this, 'priv_save'), 'admin', 'smd_um_priv_save', 1);
         }
 
+        add_privs($this->event.'.smd_um_active', $this->privs);
         register_callback(array($this, 'welcome'), 'plugin_lifecycle.smd_user_manager');
         register_callback(array($this, 'options'), 'plugin_prefs.smd_user_manager', null, 1);
         register_callback(array($this, 'inject_css'), 'admin_side', 'head_end');
         $has_footer = callback_handlers('admin_side', 'footer');
 
-        if (!in_array(__CLASS__.'->active_users', $has_footer)) {
+        if (has_privs($this->event.'.smd_um_active') && !in_array(__CLASS__.'->active_users', $has_footer)) {
             register_callback(array($this, 'active_users'), 'admin_side', 'footer');
         }
 
