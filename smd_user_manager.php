@@ -667,7 +667,7 @@ class smd_um
         $out[] = td($row['article_count'] ? eLink('list', 'list', 'search_method', 'author', $row['article_count'], 'crit', $row['name']) : '0');
         $out[] = td($row['image_count'] ? eLink('image', 'image_list', 'search_method', 'author', $row['image_count'], 'crit', $row['name']) : '0');
         $out[] = td($row['file_count'] ? eLink('file', 'file_list', 'search_method', 'author', $row['file_count'], 'crit', $row['name']) : '0');
-        $out[] = td($row['link_count'] ? eLink('link', 'link_edit', 'search_method', 'author', $row['link_count'], 'crit', $row['name']) : '0');
+        $out[] = td($row['link_count'] ? eLink('link', 'link_list', 'search_method', 'author', $row['link_count'], 'crit', $row['name']) : '0');
 
         return implode(n, $out);
     }
