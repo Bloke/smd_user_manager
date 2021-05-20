@@ -6,6 +6,7 @@ h2. 0.3.0-beta - 2021-05-20
 * Better integration with the Users panel - removed tonnes of duplicate core code.
 * Massively reduced plugin's global footprint.
 * Moved prefs to Admin>Preferences panel.
+* Public tag is registered on front- and back-end.
 * Only show active users to admins (better for security).
 
 h2. 0.2.1 - 2013-11-10

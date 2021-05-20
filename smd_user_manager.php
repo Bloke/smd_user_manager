@@ -442,7 +442,7 @@ class smd_um
         set_pref('smd_um_current_users', json_encode($curr_users), 'smd_um', PREF_HIDDEN, '', 0);
 
         // Merge in the groups only for now.
-        $this->priv_merge(1, 0);
+        $this->priv_merge(true, false);
 
         // Permit user self-editing.
         $smd_um_grps = array_keys($this->get_groups(0));
@@ -454,18 +454,12 @@ class smd_um
         // and merge in the changes. One caveat: if we're saving the privs we
         // need to delay the database merge until after the resets have been applied,
         // otherwise we won't know what the defaults (in admin_config.php) are.
-        $do_privs = ($step === 'smd_um_priv_save') ? 0 : 1;
-        $this->priv_merge(0, $do_privs);
+        $do_privs = ($step === 'smd_um_priv_save') ? false : true;
+        $this->priv_merge(false, $do_privs);
     }
 
     /**
      * CSS definitions: hopefully kind to themers.
-     *
-     * Includes a hack for the Remora theme (#nav li ul) to prevent menu from
-     * disappearing under the privs content. This only occurs because the
-     * .smd_um_privgroup class uses position:relative.
-     *
-     * Needs workaround as it affects other plugins.
      *
      * @return string Style rules
      */
@@ -479,7 +473,6 @@ class smd_um
 .smd_um_selected { background-color:#e2dfce; }
 .smd_um_grp_name, .smd_um_prv_name, .smd_um_reset_col { cursor:pointer; }
 .smd_um_checkbox, .smd_um_prv_hdr { text-align:center!important; }
-#nav li ul { z-index:10000; }
 ',
         );
 
@@ -673,46 +666,11 @@ class smd_um
     }
 
     /**
-     * Determine if the logged-in user can edit the given user account.
+     * Add a new user group.
      *
-     * @param  int    $curr_priv Privilege level of the currently logged-in user
-     * @param  string $name      User account (login name) to edit
-     * @param  int    $privs     Privilege level of the $name user account
-     * @return bool
+     * @param  string $evt  Textpattern event (panel)
+     * @param  string $stp  Textpattern step (action)
      */
-    public function can_edit($curr_priv, $name, $privs)
-    {
-        global $txp_user;
-
-        $smd_um_prefs = $this->get_prefs();
-
-        // Assume no editing rights unlesss otherwise stated.
-        $permitted = false;
-
-        $tiered = get_pref('smd_um_hierarchical_groups', $smd_um_prefs['smd_um_hierarchical_groups']['default']);
-        $protected = get_pref('smd_um_admin_group', $smd_um_prefs['smd_um_admin_group']['default']);
-
-        // For some reason checking ($privs != '') doesn't work *shrug*.
-        if (($name != '') && ($privs == 0 || $privs)) {
-            $permitted = has_privs($this->event . '.edit.own') && ($name == $txp_user);
-            $can_edit = has_privs($this->event . '.edit');
-
-            if ($can_edit) {
-                $permitted |= $can_edit;
-
-                if ($tiered) {
-                    $permitted &= (($privs >= $curr_priv) || ($privs == 0));
-                }
-
-                if ($protected) {
-                    $permitted &= (($privs != $protected) || ($curr_priv == $protected));
-                }
-            }
-        }
-
-        return $permitted;
-    }
-
     public function group_add($evt, $stp)
     {
         global $txp_permissions;
@@ -773,7 +731,7 @@ class smd_um
     }
 
     /**
-     * Delete a group if it's not in the core set
+     * Delete a group if it's not in the core set.
      *
      * @param string $evt  Textpattern event (panel)
      * @param string $stp  Textpattern step (action)
@@ -978,7 +936,7 @@ class smd_um
         }
 
         // Merge the changes into the priv table
-        $this->priv_merge(0, 1);
+        $this->priv_merge(false, true);
         $this->message = gTxt('smd_um_prv_saved');
         $this->privs($evt, $stp);
     }
@@ -1009,7 +967,7 @@ class smd_um
                 } else {
                     safe_insert(SMD_UM_PRIVS, "area='" . doSlash($name) . "'");
 
-                    $this->priv_merge(0, 1);
+                    $this->priv_merge(false, true);
                     $this->message = gTxt('smd_um_prv_created', array('{area}' => $name));
                 }
             }
@@ -1230,7 +1188,12 @@ EOJS
     }
 
     /**
-     * Add buttons to the interface based on privs
+     * Add buttons to the interface based on privs.
+     *
+     * @param string $evt     Textpattern event (panel)
+     * @param string $stp     Textpattern step (action)
+     * @param array  $buttons Current UI button set
+     * @return array          Updated buttons based on user privs
      */
     public function buttons($evt, $stp, &$buttons)
     {
@@ -1250,9 +1213,13 @@ EOJS
     }
 
     /**
-     * Merge/edit the groups & privs into the existing global arrays
+     * Merge/edit the groups & privs into the existing global arrays.
+     *
+     * @param bool $do_grp  Whether to merge the custom groups with core
+     * @param bool $do_priv Whether to merge the custom privileges with core
+     * @param bool $replace Whether to append (false) or replace (true) the privs/groups
      */
-    protected function priv_merge($do_grp = 1, $do_priv = 1, $refresh = false)
+    protected function priv_merge($do_grp = true, $do_priv = true, $replace = false)
     {
         global $txp_groups, $txp_permissions;
 
@@ -1261,7 +1228,7 @@ EOJS
         if ($do_grp && $this->table_exist(SMD_UM_GROUPS)) {
             $new_groups = safe_rows('id, name', SMD_UM_GROUPS, '1=1');
 
-            $txp_groups = $refresh ? array() : $txp_groups;
+            $txp_groups = $replace ? array() : $txp_groups;
 
             foreach ($new_groups as $row) {
                 $txp_groups[$row['id']] = $row['name'];
@@ -1276,7 +1243,7 @@ EOJS
             // Allow this plugin's strings to be skipped if we don't want people upsetting the plugin's behaviour.
             $self_edit = get_pref('smd_um_self_alter', $smd_um_prefs['smd_um_self_alter']['default']);
 
-            $txp_permissions = $refresh ? array() : $txp_permissions;
+            $txp_permissions = $replace ? array() : $txp_permissions;
 
             foreach ($new_privs as $row) {
                 if (strpos($row['area'], 'smd_um') === false || $self_edit) {
@@ -1320,9 +1287,12 @@ EOJS
     }
 
     /**
-     * Update any language string.
+     * Add/update any language string for group name.
      *
      * Note this may leave orphan strings if the name is changed.
+     *
+     * @param string $title New string content
+     * @param string $name  Language key to create/replace. Use sanitized $title if omitted
      */
     public function upsert_lang($title, $name = '')
     {
@@ -1363,7 +1333,7 @@ EOJS
             return $permitted_users[$type];
         }
 
-        $this->priv_merge(1, 0, $force);
+        $this->priv_merge(true, false, $force);
         $smd_um_prefs = $this->get_prefs();
 
         $levels = ($type) ? get_groups() : $txp_groups;
@@ -1558,16 +1528,16 @@ EOJS
     }
 
     /**
-     * Test if the table(s) exist.
+     * Test if the table(s) exist and/or have the correct column count.
      *
-     * @param  string $which [description]
-     * @return [type]        [description]
+     * @param  string $which The table to check for existence/integrity
+     * @return bool          Whether the table is properly installed or not
      */
     public function table_exist($which = '')
     {
         static $smd_um_installed = array();
 
-        // The number of expected cols in each table
+        // The number of expected cols in each table.
         $tbls = array(
             SMD_UM_GROUPS => 3,
             SMD_UM_PRIVS => 2,
