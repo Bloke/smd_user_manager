@@ -1,5 +1,7 @@
 h1. smd_user_manager
 
+h2. Features
+
 Complete user / group / privilege management. Features:
 
 * Augments the _Admin>Users_ panel.
@@ -15,50 +17,32 @@ h2. Installation / uninstallation
 
 p(important). Requires Txp 4.8.6+
 
-Download the plugin from either "textpattern.org":http://textpattern.org/plugins/1229/smd_user_manager, or the "software page":https://stefdawson.com/sw, paste the code into the Txp _Admin->Plugins_ pane, install and enable the plugin. The tables will be installed and populated automatically unless you use the plugin from the cache directory; in either case, visiting the _Admin->User manager_ tab will install and populate them.
+Download the plugin from either "the Textpattern plugins repo":https://plugins.textpattern.com/plugins/smd_user_manager, "GitHub":https://github.com/Bloke/smd_user_manager, or "my software page":https://stefdawson.com/sw, paste the code into the Txp _Admin->Plugins_ panel, install and enable the plugin. The tables will be installed and populated automatically unless you use the plugin from the cache directory; in either case, visiting the _Admin->User manager_ tab will install and populate them.
 
-To uninstall the plugin, first assign all your users to groups in Txp's first six, then delete the plugin from the _Admin->Plugins_ page. The tables will be deleted automatically. If you do not reassign users to those default groups, you may have users with 'dangling' (i.e. no) privs. The outcome of what happens when such users log in is thus undefined: at the very least you'll get admin-side errors thrown.
+To uninstall the plugin, first assign all your users to groups in Txp's first six, then delete the plugin from the _Admin->Plugins_ panel. The tables will be deleted automatically. If you do not reassign users to those default groups, you may have users with 'dangling' (i.e. no) privs. The outcome of what happens when such users log in is thus undefined: at the very least you'll get admin-side errors thrown.
 
 Visit the "forum thread":http://forum.textpattern.com/viewtopic.php?id=36558 for more info or to report on the success or otherwise of the plugin.
 
 h2. Admin side overview
 
-Visit the _Admin->User manager_ tab. The default view (for admins) is a list of users. There are buttons at the top of the screen: __Change password__, "Users":#smd_um_users, "Groups":#smd_um_groups, "Privs":#smd_um_privs, and "Prefs":#smd_um_prefs. Each of those displays an area for the management of that component.
-
-Please note: The plugin tries to remove the _Admin->Users_ menu, but depending on your installed theme this may not be possible. If the menu item remains, it will perform the same function as clicking the _User manager_ tab.
+Visit the _Admin->User manager_ tab. The default view (for admins) is a list of users. There are buttons at the top of the screen: __Change password__, "Users":#smd_um_users, "Groups":#smd_um_groups, and "Privs":#smd_um_privs. Each of those displays an area for the management of that component.
 
 h2(#smd_um_users). User management (_Users_ button)
 
-View / search the installed user base. Change the number of users you wish to see per page by using the 'per page' dropdown below the list. The columns on display are:
+View / search the installed user base as normal. Additional columns on display are:
 
-* Login -- user name
-* Real Name -- full name
-* E-mail -- e-mail address
-* Privileges -- user group
-* Last Login -- month & year of last access to the Textpattern admin side
 * Articles -- number of articles authored by this user
 * Images -- number of images uploaded by this user
 * Files -- number of files uploaded by this user
 * Links -- number of links created by this user
 
-Click _New user_ (admins only) to create a new user account and automatically send a randomly-generated password to the nominated e-mail address.
-Click a login name (privileges required) to edit the details about that user. If you have any smd_bio fields set up, they can also be edited (and hovering over the login name will retrieve some extended biographical info).
-Click an e-mail address to launch your e-mail software to send a message to the user.
 Click an article / image / file / link value to see the content owned by that user.
 
-You may sort the columns by clicking the headings. Click once to sort in ascending order, click again to sort in descending order. An arrow shows the sort direction. Your sort column and direction are remembered next time you visit the panel.
-
-You may also search users by login name, real name, e-mail address, privilege level (number or name), or content count. A few notes about searching:
+Filter and sort the columns as usual by clicking the headings, using the Column display options or the Search box. Note that:
 
 * When searching privileges by name, only the _first matching_ group will be returned -- the privs are searched in order of their ID.
 * You may search privileges and content counts by specifying an exact value, for example Article count: 0 shows all accounts with no articles (perhaps a self-registered spammer or malicious user?)
 * You may also search these fields using greater-than or less-than symbols to find users with the matching number of assets. For example, Image count: @>=50@ shows all users with 50 images or more.
-
-You can also perform multi-edits by selecting the rows to alter via the checkboxes and using the dropdown immediately below the list to make mass changes. The options are:
-
-* Change privileges: set all selected users to the given privilege level. When you choose this option, a further dropdown appears to allow you to choose which level to apply.
-* Reset password: send a new password to all selected users.
-* Delete: remove all selected user accounts. A further dropdown appears with a list of user accounts in it: choose one to transfer over any content that belonged to the deleted user(s).
 
 A common use is to find any users with 0 articles, and then use the multi-edit tool to delete them all.
 
@@ -76,13 +60,13 @@ h2(#smd_um_privs). Priv management (_Privs_ button)
 
 From this panel you may alter which user groups can access which parts of the admin side interface or perform certain types of action. You will see a list of 'area' headings. Click one to expand it and see the privileges it contains; click it again to collapse it. The open/closed state of the areas is remembered next time you visit the panel.
 
-Each area has a row of checkboxes alongside it. If a checkbox is ticked in a column corresponding to a privilege group, that group has access to that feature of the interface. You may alter who sees what by changing the tick boxes and hitting one of the _Save_ buttons that appear to the left of each area heading; all the buttons do the same thing: they save the entire list of privileges. You must confirm the action, because the change is immediate.
+Each area has a row of checkboxes alongside it. If a checkbox is ticked in a column corresponding to a privilege group, that group has access to that feature of the interface. You may alter who sees what by changing the tick boxes and hitting one of the _Save_ buttons in each area heading; all the buttons do the same thing: they save the entire list of privileges. You must confirm the action, because the change is immediate.
 
 You may change checkboxes in batches by selecting rows/columns and then using a keyboard shortcut to make changes to all highlighted checkboxes. Firstly, choose which checkboxes to apply your changes:
 
 # click a column heading to highlight that entire Group
 # click a row heading to highlight that entire Priv set
-# click the top left-hand corner of the collapsible table to select all checkboxes
+# click the top left-hand corner of the set to select all checkboxes
 
 You can select multiple columns/rows from multiple areas if you wish. Clicking a row/column/corner heading again will toggle its status.
 
@@ -97,7 +81,7 @@ The area headings merely group the areas for convenience and make the page look 
 
 The 'tab' area heading governs which user groups have access to the primary navigation areas (content, presentation, admin, extensions and any custom tabs such as those created by smd_tabber). Note that giving access to these tabs does not automatically give access to the secondary navigation elements; you must turn those on independently. By contrast, giving a user group access to a secondary navigation item _does_ allow them to use that feature but they won't be able to navigate to it using the primary navigation button unless they have also been given access to that tab.
 
-For example, if you grant the 'page' privilege to Freelancers but don't give them access to the Presentation tab, they could type @?event=page@ in the URL to get to the Pages panel but they would have no means of navigating there by clicking the mouse. Since the primary 'Presentation' tab is missing, the secondary tabs are all missing too, even though some of them may be permitted for that group of users.
+For example, if you grant the 'page' privilege to Freelancers but don't give them access to the Presentation tab, they could type @?event=page@ in the URL to get to the Pages panel but they would have no means of navigating there by clicking the menu. Since the primary 'Presentation' tab is missing, the secondary tabs are all missing too, even though some of them may be permitted for that group of users.
 
 If you wish to add your own priv area, type a new one in the box at the top of the panel and hit _Create_. Your area will be created under the appropriate heading, e.g. if you specified @smd_test@ it would appear under the @smd@ heading, or if you created a @file.trusted@ privilege area, it would appear under the @file@ heading. Core areas are normally specified by a dotted notation but you are free to choose any notation that makes sense to your application.
 
@@ -105,7 +89,7 @@ Note that:
 
 # some plugins may not show up in the list due to factors such as plugin load order or the mechanism by which the plugin is written.
 # the @[R]@ column is a special Reset indicator. Checking any row in this column will ignore any privilege checkboxes you may have set or altered and will reset the corresponding privs to their defaults after you click Save.
-# by default you may not add @smd_um@ privs to override the functionality if this plugin, although you can adjust who can edit what so be careful not to open the permissions too widely. A preference setting governs whether smd_um can have its own privs altered.
+# by default you may not add @smd_um@ privs to override the functionality of this plugin, although you can adjust who can edit what so be careful not to open the permissions too widely. A preference setting governs whether smd_um can have its own privs altered.
 # you can create priv areas that may be tested from the public side using the "smd_um_has_privs":#smd_um_has_privs tag.
 
 h2(#smd_um_prefs). Preference management (_Prefs_ button)
@@ -122,12 +106,6 @@ Administrators can set global preferences that govern the behaviour of the plugi
 : Once set, the nominated group is off-limits to all users apart from those already in the selected group. In other words, non-admin users cannot create, modify, alter (or mass-alter) any privilege setting using this group.
 : Can be used in tandem with or independently of the _Assume hierarchical groups_ setting.
 : Default: 1 (a.k.a. Publishers)
-; *Maximum user search result limit*
-: Maximum number of search results to return when filtering the User list.
-: Default: 500
-; *Password length (characters)*
-: The number of characters in newly-generated passwords. The higher the better (up to a point).
-: Default: 12
 ; *Activity timeout (seconds)*
 : Number of seconds within which someone has to perform an admin-side action to remain visible on the Active Users list. For high activity sites, you can lower this value and receive a more responsive (accurate) list, at the possible expense of more perceived fluctuations in user activity when the timeout is exceeded. Lengthening the value will keep online users in the list longer, even though they may not actually still be active.
 : Default: 60
@@ -143,19 +121,11 @@ Users may also change their password using the button at the top of the screen.
 
 h2(#smd_um_active). Active users
 
-At the bottom of each smd_user_manager panel is a list of currently active ("online") users. Each user is hyperlinked to the "Users":#smd_um_users panel to show you the info about just that person, which is a convenient shortcut to find out about a logged-in author.
+At the bottom of each back-end panel, admins can see a list of currently active ("online") users. Each user is hyperlinked to the "Users":#smd_um_users panel to show you the info about just that person, which is a convenient shortcut to find out about a logged-in author.
 
 An active user is one who has performed some admin-side action in the past N seconds, where N is defined in the "Activity Timeout plugin preference":#smd_um_prefs.
 
-h2(#smd_um_callbacks). Developer callbacks
-
-The plugin honours as many existing Textpattern callbacks found on the __Admin->Users__ panel as it can. In addition, the following callbacks are defined:
-
-table(txp-list).
-|_. Event |_. Step |_. Pre |_. Payload |_. Comments |
-| smd_user_manager | password.reset | 0 | array comprising user name, password and email address | Return some string from your callback function to bypass the internal send_new_password() call. The returned string will be announced in the UI. Returning an empty string (or null) will still trigger the default password reset behaviour |
-
-h2. Public side tags
+h2. Public side tag
 
 h3(#smd_um_has_privs). Tag: @<txp:smd_um_has_privs>@
 
@@ -165,15 +135,15 @@ Note that the plugin does not have a public-side logging in/out facility, it mer
 
 Attributes:
 
-; %name%
+; *name*
 : Check the current logged-in user's name against this list of names.
 : IMPORTANT: Case sensitive.
-; %group%
+; *group*
 : Check the current logged-in user's group (privilege) level is in this list of numbers.
 : You can specify @>@ and @<@ symbols before any value to indicate you wish to check if the user has privileges higher or lower than a given number, respectively.
 : If checking priv values less than a number, 0 (a.k.a None) is _never_ included: you must add it to the list explicitly if you wish to test for it.
 : Example: @group="11, <4"@ means "does the user have privs of 11, 1, 2, or 3?"
-; %area%
+; *area*
 : Check the current logged-in user has the ability to access one of the given areas in this list.
 : Example: @area="sports_hall, chemistry_lab"@ would only perform the contained content if the logged-in user's priv level was present in either the sports_hall or chemistry_lab priv areas.
 
