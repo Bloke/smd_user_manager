@@ -1,0 +1,16 @@
+{
+  "name": "bloke/smd_user_manager",
+  "description": "Manage many user accounts, groups and privileges in Textpattern",
+  "keywords": ["textpattern", "plugin", "users", "roles", "multiple", "administration", "active", "online", "accounts", "permissions", "privileges"],
+  "homepage": "https://github.com/bloke/smd_user_manager",
+  "license": "GPL-2.0",
+  "type": "textpattern-plugin",
+  "support": {
+    "issues": "https://github.com/bloke/smd_user_manager/issues",
+    "source": "https://github.com/bloke/smd_user_manager"
+  },
+  "require": {
+    "textpattern/lock": ">=4.8.6",
+    "textpattern/installer": "*"
+  }
+}

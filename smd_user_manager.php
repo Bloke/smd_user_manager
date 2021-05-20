@@ -17,7 +17,7 @@ $plugin['name'] = 'smd_user_manager';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.3.0';
+$plugin['version'] = '0.3.0-beta';
 $plugin['author'] = 'Stef Dawson';
 $plugin['author_uri'] = 'https://stefdawson.com/';
 $plugin['description'] = 'Manage user accounts, groups and privileges';
@@ -373,7 +373,7 @@ class smd_um
      *
      * @var string
      */
-    protected $version = '0.3.0';
+    protected $version = '0.3.0-beta';
 
     /**
      * The plugin's privileges.
@@ -1658,20 +1658,16 @@ if (0) {
 # --- BEGIN PLUGIN HELP ---
 h1. smd_user_manager
 
-Complete user / group / privs management. Features:
+Complete user / group / privilege management. Features:
 
-* Replaces _Admin->Users_ tab
-* Add / edit / list users, with content counts alongside each user
-* Search, sort, or filter the users (standard Txp pagination result depths apply)
-* Quickly find accounts with certain characteristics (e.g. self-registered spam accounts with 0 articles)
-* Perform multi-edits: change privilege / reset pass / delete
-* All users can edit their own details and change their password
-* Create new user groups (a.k.a. roles) if the default six aren't enough
-* Rename existing groups to more suitable names (you cannot delete them)
-* Modify Txp's standard priv areas to alter what each user group can see/do
-* Add new priv areas (useful for custom code to save doing it in a plugin)
-* A "who's online" indicator
-* Integrates with smd_bio (v0.40+) and smd_prognostics (v0.20+)
+* Augments the _Admin>Users_ panel.
+* Add / edit / list / filter users as normal, with additional content counts alongside each.
+* Quickly find accounts with certain characteristics (e.g. self-registered spam accounts with 0 articles).
+* Create new user groups (a.k.a. roles) if the default six aren't enough.
+* Rename existing groups to more suitable names (you cannot delete them).
+* Modify Textpattern's standard privilege areas to alter what each user group can see/do.
+* Add new priv areas (useful for custom code to save doing it in a plugin).
+* A "who's online" indicator for admins.
 
 h2. Installation / uninstallation
 
@@ -1849,13 +1845,6 @@ h2. Author / credits
 
 Written by "Stef Dawson":https://stefdawson.com/contact. Thanks to the beta test team jakob, mrdale, alanfluff, maverick, Destry, redbot, and rsilletti for their willingness to let my code loose on their servers.
 
-h2. Changelog
-
-* 10 Nov 2013 | v0.21 | Only save privs if they differ
-* 16 May 2013 | v0.20 | Updated for Txp 4.5.0+; added callback smd_user_manager > password.reset to allow interception of reset messages (thanks MattE)
-* 25 Jan 2012 | v0.12 | Fixed smd_um_has_privs multiple area check ; fixed prefs options from Plugins pane
-* 03 Nov 2011 | v0.11 | Added smd_um_has_privs tag to check privs/areas ; added preference to allow editing of smd_um privs; fixed handling of users with privs=None
-* 27 Jul 2011 | v0.10 | Initial public release
 # --- END PLUGIN HELP ---
 -->
 <?php

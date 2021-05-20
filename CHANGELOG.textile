@@ -1,0 +1,33 @@
+h1. Changelog
+
+h2. 0.3.0-beta - 2021-05-20
+
+* Complete rewrite for Textpattern 4.8.6+.
+* Better integration with the Users panel - removed tonnes of duplicate core code.
+* Massively reduced plugin's global footprint.
+* Moved prefs to Admin>Preferences panel.
+* Only show active users to admins (better for security).
+
+h2. 0.2.1 - 2013-11-10
+
+* Only save privs if they differ
+
+h2. 0.2.0 - 2013-05-16
+
+* Updated for Textpattern 4.5.0.
+* Added callback smd_user_manager > password.reset to allow interception of reset messages (thanks, MattE).
+
+h2. 0.1.2 - 2012-01-25
+
+* Fixed smd_um_has_privs multiple area check.
+* Fixed prefs options from Plugins panel.
+
+h2. 0.1.1 - 2011-11-03
+
+* Added smd_um_has_privs tag to check privs/areas.
+* Added preference to allow editing of smd_um privs.
+* Fixed handling of users with privs=None.
+
+h2. 0.1.0 - 2011-07-27
+
+* Official public release.

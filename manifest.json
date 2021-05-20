@@ -1,0 +1,11 @@
+{
+  "name": "smd_user_manager",
+  "description": "Manage many user accounts, groups and privileges in Textpattern",
+  "version": "0.3.0-beta",
+  "type": 5,
+  "author": "Stef Dawson",
+  "author_uri": "https://stefdawson.com/",
+  "order": 8,
+  "flags": 3,
+  "help": {"file" : ["./README.textile"]}
+}
