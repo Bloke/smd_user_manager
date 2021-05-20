@@ -56,9 +56,10 @@ $plugin['flags'] = '3';
 
 $plugin['textpack'] = <<<EOT
 #@owner smd_user_manager
-#@admin
 #@language en, en-gb, en-us
+#@admin-side
 smd_um_active => Currently active: {users}
+#@admin
 smd_um_article_count => Articles
 smd_um_based_on => based on
 smd_um_file_count => Files
@@ -103,7 +104,9 @@ smd_um_admin_group => Protected administrator group
 smd_um_hierarchical_groups => Assume hierarchical groups (levels)
 smd_um_self_alter => Allow smd_um privs to be altered
 #@language fr-fr
+#@admin-side
 smd_um_active => Utilisateurs actuellement actifs {users}
+#@admin
 smd_um_article_count => Articles
 smd_um_based_on => basé sur
 smd_um_file_count => Fichiers
@@ -146,7 +149,9 @@ smd_um_admin_group => Groupe protégé d'administrateurs
 smd_um_hierarchical_groups => Chargé de la hiérarchie des groupes (levels)
 smd_um_self_alter => Accès aux privilèges de smd_um
 #@language es
+#@admin-side
 smd_um_active => Usuarios actualmente conectados: {users}
+#@admin
 smd_um_article_count => Artículos
 smd_um_based_on => basado en
 smd_um_file_count => Ficheros
