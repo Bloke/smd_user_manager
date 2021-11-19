@@ -814,7 +814,7 @@ class smd_um
 
         $msg = $this->message;
 
-        // Render the page
+        // Render the page.
         pagetop(gTxt('smd_um_tab_name').' &raquo; '.gTxt('smd_um_grp_lbl'), $msg);
         $btnbar = array();
         $this->buttons($this->event, '', $btnbar);
@@ -823,7 +823,7 @@ class smd_um
         unset($grouplist[0]); // Don't want None privs
         $grouplist = selectInput('smd_um_new_grp_based_on', $grouplist, '', true, '', 'smd_um_new_grp_based_on');
 
-        // New group
+        // New group.
         echo '<h1 class="txp-heading">', gTxt('smd_um_heading_grp'), '</h1>',
             n. '<div id="'.$this->event.'_control" class="txp-control-panel">',
             n. implode(n, $btnbar),
@@ -843,7 +843,7 @@ class smd_um
                 ),
             n, '</div>';
 
-        // Retrieve the group info and user counts per privilege level
+        // Retrieve the group info and user counts per privilege level.
         $fields = 'smdg.id, smdg.name, smdg.core, txu.total AS user_count';
         $clause = ' FROM '.PFX.'smd_um_groups AS smdg
             LEFT JOIN (SELECT privs, count(privs) AS total FROM '.PFX.'txp_users GROUP BY privs) AS txu ON smdg.id = txu.privs';
@@ -1407,22 +1407,6 @@ EOJS
                 PRIMARY KEY (`id`)
             ) ENGINE=MyISAM PACK_KEYS=1";
 
-            if (gps('debug')) {
-                dmp($sql);
-            }
-
-            // Build the tables first before attempting to check if they
-            // exist to upgrade their definitions.
-            foreach ($sql as $qry) {
-                $ret = safe_query($qry);
-
-                if ($ret === false) {
-                    $GLOBALS['txp_err_count']++;
-                    echo "<b>".$GLOBALS['txp_err_count'].".</b> ".mysqli_error($DB->link)."<br />\n";
-                    echo "<!--\n $qry \n-->\n";
-                }
-            }
-
             // Handle upgrades: be kind to beta testers.
             if ($this->table_exist(SMD_UM_PRIVS)) {
                 $flds = getThings('SHOW COLUMNS FROM `'.PFX.SMD_UM_PRIVS.'`');
@@ -1444,7 +1428,9 @@ EOJS
                     $priv_list = do_list($privs);
 
                     foreach ($priv_list as $priv) {
-                        $sql[] = "INSERT INTO `".PFX.SMD_UM_PRIVS."` VALUES ('$area', '$priv')";
+                        if (is_numeric($priv)) {
+                            $sql[] = "INSERT INTO `".PFX.SMD_UM_PRIVS."` VALUES ('$area', '$priv')";
+                        }
                     }
                 }
             }
@@ -1515,7 +1501,8 @@ EOJS
         $sql = array();
         $GLOBALS['txp_err_count'] = 0;
 
-        if ($this->table_exist()) {
+        if ($this->table_exist(1)) {
+
             $sql[] = "DROP TABLE IF EXISTS " .PFX.SMD_UM_PRIVS. "; ";
             $sql[] = "DROP TABLE IF EXISTS " .PFX.SMD_UM_GROUPS. "; ";
 
@@ -1552,11 +1539,17 @@ EOJS
     /**
      * Test if the table(s) exist and/or have the correct column count.
      *
+     * Error 1146 is ER_NO_SUCH_TABLE in MySQL. The fastest way to determine if
+     * a table exists is SELECT 1 LIMIT 1 from it. But safe_query() will throw
+     * an error so resort to mysqli_query() for these tests.
+     *
      * @param  string $which The table to check for existence/integrity
      * @return bool          Whether the table is properly installed or not
      */
     public function table_exist($which = '')
     {
+        global $DB;
+
         static $smd_um_installed = array();
 
         // The number of expected cols in each table.
@@ -1573,17 +1566,29 @@ EOJS
             $out = count($tbls);
 
             foreach ($tbls as $tbl => $cols) {
-                $num = count(safe_show('columns', $tbl));
-                $smd_um_installed[$tbl] = $num;
-                $out -= ($tbls[$tbl] == $num) ? 1 : 0;
+                mysqli_query($DB->link, "SELECT 1 FROM ".PFX.$tbl." LIMIT 1");
+                $err = mysqli_errno($DB->link);
+
+                if ($err !== 1146) {
+                    $num = count(safe_show('columns', $tbl));
+                    $smd_um_installed[$tbl] = $num;
+                    $out -= ($tbls[$tbl] == $num) ? 1 : 0;
+                }
             }
 
             return ($out === 0) ? 1 : 0;
         } elseif (array_key_exists($which, $tbls)) {
-            $num = count(safe_show('columns', $which));
-            $smd_um_installed[$which] = $num;
+            mysqli_query($DB->link, "SELECT 1 FROM ".PFX.$which." LIMIT 1");
+            $err = mysqli_errno($DB->link);
 
-            return ($smd_um_installed[$which] == $tbls[$which]);
+            if ($err !== 1146) {
+                $num = count(safe_show('columns', $which));
+                $smd_um_installed[$which] = $num;
+
+                return ($smd_um_installed[$which] == $tbls[$which]);
+            }
+
+            return false;
         }
 
         return false;
