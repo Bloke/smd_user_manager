@@ -408,7 +408,6 @@ class smd_um
         } elseif ($event === 'plugin_prefs.smd_user_manager') {
             add_privs('plugin_prefs.smd_user_manager', $this->privs);
         } elseif ($event === $this->event) {
-            add_privs('plugin_prefs.smd_user_manager', $this->privs);
             add_privs($this->event.'.smd_um_grp', $this->privs);
             add_privs($this->event.'.smd_um_prv', $this->privs);
             register_callback(array($this, 'steps'), 'user', 'steps');
