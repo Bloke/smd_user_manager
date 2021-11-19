@@ -405,6 +405,8 @@ class smd_um
 
         if ($event === 'prefs') {
             add_privs('prefs.smd_user_manager', $this->privs);
+        } elseif ($event === 'plugin_prefs.smd_user_manager') {
+            add_privs('plugin_prefs.smd_user_manager', $this->privs);
         } elseif ($event === $this->event) {
             add_privs('plugin_prefs.smd_user_manager', $this->privs);
             add_privs($this->event.'.smd_um_grp', $this->privs);
