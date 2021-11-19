@@ -1379,7 +1379,7 @@ EOJS
      */
     public function install()
     {
-        global $DB, $txp_groups, $txp_permissions;
+        global $DB, $txp_groups, $txp_permissions, $prefs;
 
         $currentVersion = get_pref('smd_user_manager_version', 'base');
 
@@ -1405,6 +1405,22 @@ EOJS
                 `core` bool NOT NULL default 0,
                 PRIMARY KEY (`id`)
             ) ENGINE=MyISAM PACK_KEYS=1";
+
+            if (gps('debug')) {
+                dmp($sql);
+            }
+
+            // Build the tables first before attempting to check if they
+            // exist to upgrade their definitions.
+            foreach ($sql as $qry) {
+                $ret = safe_query($qry);
+
+                if ($ret === false) {
+                    $GLOBALS['txp_err_count']++;
+                    echo "<b>".$GLOBALS['txp_err_count'].".</b> ".mysqli_error($DB->link)."<br />\n";
+                    echo "<!--\n $qry \n-->\n";
+                }
+            }
 
             // Handle upgrades: be kind to beta testers.
             if ($this->table_exist(SMD_UM_PRIVS)) {
@@ -1526,7 +1542,7 @@ EOJS
 
         safe_delete(
             'txp_prefs',
-            "name like 'smd\_um\_%'"
+            "name like 'smd\_um\_%' OR name like 'smd\_user\_manager\_%'"
         );
 
         // @todo delete Textpack.
