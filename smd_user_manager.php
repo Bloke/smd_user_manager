@@ -103,7 +103,7 @@ smd_um_active_timeout => Activity timeout (seconds)
 smd_um_admin_group => Protected administrator group
 smd_um_hierarchical_groups => Assume hierarchical groups (levels)
 smd_um_self_alter => Allow smd_um privs to be altered
-#@language fr-fr
+#@language fr
 #@admin-side
 smd_um_active => Utilisateurs actuellement actifs {users}
 #@admin
