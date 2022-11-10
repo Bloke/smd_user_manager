@@ -1539,9 +1539,8 @@ EOJS
     /**
      * Test if the table(s) exist and/or have the correct column count.
      *
-     * Error 1146 is ER_NO_SUCH_TABLE in MySQL. The fastest way to determine if
-     * a table exists is SELECT 1 LIMIT 1 from it. But safe_query() will throw
-     * an error so resort to mysqli_query() for these tests.
+     * There's no core mechanism to show tables, so resort to
+     * mysqli_query() for these tests.
      *
      * @param  string $which The table to check for existence/integrity
      * @return bool          Whether the table is properly installed or not
@@ -1566,10 +1565,9 @@ EOJS
             $out = count($tbls);
 
             foreach ($tbls as $tbl => $cols) {
-                mysqli_query($DB->link, "SELECT 1 FROM ".PFX.$tbl." LIMIT 1");
-                $err = mysqli_errno($DB->link);
+                $res = mysqli_query($DB->link, "SHOW TABLES LIKE '".PFX.$tbl."'");
 
-                if ($err !== 1146) {
+                if (mysqli_fetch_row($res) !== NULL) {
                     $num = count(safe_show('columns', $tbl));
                     $smd_um_installed[$tbl] = $num;
                     $out -= ($tbls[$tbl] == $num) ? 1 : 0;
@@ -1578,10 +1576,9 @@ EOJS
 
             return ($out === 0) ? 1 : 0;
         } elseif (array_key_exists($which, $tbls)) {
-            mysqli_query($DB->link, "SELECT 1 FROM ".PFX.$which." LIMIT 1");
-            $err = mysqli_errno($DB->link);
+            $res = mysqli_query($DB->link, "SHOW TABLES LIKE '".PFX.$which."'");
 
-            if ($err !== 1146) {
+            if (mysqli_fetch_row($res) !== NULL) {
                 $num = count(safe_show('columns', $which));
                 $smd_um_installed[$which] = $num;
 
