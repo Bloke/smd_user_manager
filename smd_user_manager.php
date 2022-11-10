@@ -608,7 +608,7 @@ class smd_um
                     LEFT JOIN
                         (SELECT
                             author, count(author) AS total
-                            FROM txp_link
+                            FROM '.PFX.'txp_link
                             GROUP BY author
                         ) AS links
                         ON txp_users.name = links.author';
