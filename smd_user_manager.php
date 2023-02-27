@@ -17,7 +17,7 @@ $plugin['name'] = 'smd_user_manager';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.3.0-beta';
+$plugin['version'] = '0.3.0';
 $plugin['author'] = 'Stef Dawson';
 $plugin['author_uri'] = 'https://stefdawson.com/';
 $plugin['description'] = 'Manage user accounts, groups and privileges';
