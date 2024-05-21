@@ -17,7 +17,7 @@ $plugin['name'] = 'smd_user_manager';
 // 1 = Plugin help is in raw HTML.  Not recommended.
 # $plugin['allow_html_help'] = 1;
 
-$plugin['version'] = '0.3.0';
+$plugin['version'] = '0.4.0';
 $plugin['author'] = 'Stef Dawson';
 $plugin['author_uri'] = 'https://stefdawson.com/';
 $plugin['description'] = 'Manage user accounts, groups and privileges';
@@ -378,7 +378,7 @@ class smd_um
      *
      * @var string
      */
-    protected $version = '0.3.0-beta';
+    protected $version = '0.4.0';
 
     /**
      * The plugin's privileges.
@@ -411,10 +411,7 @@ class smd_um
             add_privs($this->event.'.smd_um_grp', $this->privs);
             add_privs($this->event.'.smd_um_prv', $this->privs);
             register_callback(array($this, 'steps'), 'user', 'steps');
-            register_callback(array($this, 'searchMethods'), 'search_criteria', 'admin');
             register_callback(array($this, 'buttons'), 'user', 'controls', 'panel');
-            register_callback(array($this, 'listHandler'), 'user', null, 'list');
-            register_callback(array($this, 'listRow'), 'user_ui', 'list.row');
             register_callback(array($this, 'groups'), 'admin', 'smd_um_groups', 1);
             register_callback(array($this, 'group_add'), 'admin', 'smd_um_group_add', 1);
             register_callback(array($this, 'group_del'), 'admin', 'smd_um_group_del', 1);
@@ -499,7 +496,11 @@ class smd_um
         if ($event === $this->event || $event === 'admin') {
             $smd_um_styles = $this->get_style_rules();
 
-            echo '<style type="text/css">', $smd_um_styles['control-panel'], '</style>';
+            if (class_exists('\Textpattern\UI\Style')) {
+                echo Txp::get('\Textpattern\UI\Style')->setContent($smd_um_styles['control-panel']);
+            } else {
+                echo '<style>' . $smd_um_styles['control-panel'] . '</style>';
+            }
         }
 
         return;
@@ -551,125 +552,6 @@ class smd_um
         return $msg;
     }
 
-    /**
-     * Add fields to the Users panel query.
-     *
-     * @param  string $evt  Textpattern event (panel)
-     * @param  string $stp  Textpattern step (action)
-     * @param  array  $data The current fields/from data
-     * @return array        The amended query content
-     */
-    public function listHandler($evt, $stp, &$data)
-    {
-        switch ($stp) {
-            case 'fields':
-                $data += array(
-                    'article_count' => array(
-                        'column' => 'articles.total',
-                        'label'  => 'articles',
-                    ),
-                    'image_count' => array(
-                        'column' => 'images.total',
-                        'label'  => 'images',
-                    ),
-                    'file_count' => array(
-                        'column' => 'files.total',
-                        'label'  => 'files',
-                    ),
-                    'link_count' => array(
-                        'column' => 'links.total',
-                        'label'  => 'links',
-                    ),
-                );
-
-                break;
-            case 'from':
-                $data .= ' LEFT JOIN
-                        (SELECT
-                            AuthorID as author, count(AuthorID) AS total
-                            FROM '.PFX.'textpattern
-                            GROUP BY AuthorID
-                        ) AS articles
-                        ON txp_users.name = articles.author
-                    LEFT JOIN
-                        (SELECT
-                            author, count(author) AS total
-                            FROM '.PFX.'txp_image
-                            GROUP BY author
-                        ) AS images
-                        ON txp_users.name = images.author
-                    LEFT JOIN
-                        (SELECT
-                            author, count(author) AS total
-                            FROM '.PFX.'txp_file
-                            GROUP BY author
-                        ) AS files
-                        ON txp_users.name = files.author
-                    LEFT JOIN
-                        (SELECT
-                            author, count(author) AS total
-                            FROM '.PFX.'txp_link
-                            GROUP BY author
-                        ) AS links
-                        ON txp_users.name = links.author';
-
-                break;
-        }
-    }
-
-    /**
-     * Add columns to the search box.
-     *
-     * @param  string $evt     Textpattern event (panel)
-     * @param  string $stp     Textpattern step (action)
-     * @param  array  $methods The current search methods
-     * @return array           The amended search methods array
-     */
-    public function searchMethods($evt, $stp, &$methods)
-    {
-        $methods += array(
-            'article_count' => array(
-                'column' => 'articles.total',
-                'label'  => gTxt('smd_um_article_count'),
-                'type'   => 'numeric',
-            ),
-            'image_count' => array(
-                'column' => 'images.total',
-                'label'  => gTxt('smd_um_image_count'),
-                'type'   => 'numeric',
-            ),
-            'file_count' => array(
-                'column' => 'files.total',
-                'label'  => gTxt('smd_um_file_count'),
-                'type'   => 'numeric',
-            ),
-            'link_count' => array(
-                'column' => 'links.total',
-                'label'  => gTxt('smd_um_link_count'),
-                'type'   => 'numeric',
-            ),
-        );
-    }
-
-    /**
-     * Add rows to the Users table.
-     *
-     * @param  string $evt  Textpattern event (panel)
-     * @param  string $stp  Textpattern step (action)
-     * @param  string $data The current block of HTML (unused)
-     * @param  array  $row  The current row of data to format
-     * @return string       The additional data table cells
-     */
-    public function listRow($evt, $stp, $data, $row)
-    {
-        $out = array();
-        $out[] = td($row['article_count'] ? eLink('list', 'list', 'search_method', 'author', $row['article_count'], 'crit', $row['name']) : '0');
-        $out[] = td($row['image_count'] ? eLink('image', 'image_list', 'search_method', 'author', $row['image_count'], 'crit', $row['name']) : '0');
-        $out[] = td($row['file_count'] ? eLink('file', 'file_list', 'search_method', 'author', $row['file_count'], 'crit', $row['name']) : '0');
-        $out[] = td($row['link_count'] ? eLink('link', 'link_list', 'search_method', 'author', $row['link_count'], 'crit', $row['name']) : '0');
-
-        return implode(n, $out);
-    }
 
     /**
      * Add a new user group.
@@ -1598,9 +1480,9 @@ EOJS
      * @param  string $val The currently selected value. Default used if unset
      * @return string      HTML
      */
-    public function selectlist($key, $val)
+    public static function selectlist($key, $val)
     {
-        $prefobj = $this->get_prefs();
+        $prefobj = self::get_prefs();
 
         return selectInput($key, $prefobj[$key]['content'], ($val ? $val : $prefobj[$key]['default']));
     }
@@ -1608,7 +1490,7 @@ EOJS
     /**
      * Settings for the plugin
      */
-    public function get_prefs()
+    public static function get_prefs()
     {
         $smd_um_prefs = array(
             'smd_um_hierarchical_groups' => array(
