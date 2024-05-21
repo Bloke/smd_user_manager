@@ -700,10 +700,8 @@ class smd_um
         pagetop(gTxt('smd_um_tab_name').' &raquo; '.gTxt('smd_um_grp_lbl'), $msg);
         $btnbar = array();
         $this->buttons($this->event, '', $btnbar);
-        $grouplist = $this->get_groups(1, true);
-
-        unset($grouplist[0]); // Don't want None privs
-        $grouplist = selectInput('smd_um_new_grp_based_on', $grouplist, '', true, '', 'smd_um_new_grp_based_on');
+        $allgroups = $this->get_groups(1, true);
+        $grouplist = selectInput('smd_um_new_grp_based_on', $allgroups, '', true, '', 'smd_um_new_grp_based_on');
 
         // New group.
         echo '<h1 class="txp-heading">', gTxt('smd_um_heading_grp'), '</h1>',
