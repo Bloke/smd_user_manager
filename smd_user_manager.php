@@ -217,9 +217,7 @@ if (!defined('txpinterface'))
 
 use \Textpattern\Search\Filter;
 
-if (txpinterface === 'admin') {
-    new smd_um();
-}
+new smd_um();
 
 if (class_exists('\Textpattern\Tag\Registry')) {
     Txp::get('\Textpattern\Tag\Registry')
@@ -395,32 +393,34 @@ class smd_um
     {
         global $event, $txp_user, $step;
 
-        if ($event === 'prefs') {
-            add_privs('prefs.smd_user_manager', $this->privs);
-        } elseif ($event === 'plugin_prefs.smd_user_manager') {
-            add_privs('plugin_prefs.smd_user_manager', $this->privs);
-        } elseif ($event === $this->event) {
-            add_privs($this->event.'.smd_um_grp', $this->privs);
-            add_privs($this->event.'.smd_um_prv', $this->privs);
-            register_callback(array($this, 'steps'), 'user', 'steps');
-            register_callback(array($this, 'buttons'), 'user', 'controls', 'panel');
-            register_callback(array($this, 'groups'), 'admin', 'smd_um_groups', 1);
-            register_callback(array($this, 'group_add'), 'admin', 'smd_um_group_add', 1);
-            register_callback(array($this, 'group_del'), 'admin', 'smd_um_group_del', 1);
-            register_callback(array($this, 'group_save'), 'admin', 'smd_um_group_save', 1);
-            register_callback(array($this, 'privs'), 'admin', 'smd_um_privs', 1);
-            register_callback(array($this, 'priv_add'), 'admin', 'smd_um_priv_add', 1);
-            register_callback(array($this, 'priv_save'), 'admin', 'smd_um_priv_save', 1);
-        }
+        if (txpinterface === 'admin') {
+            if ($event === 'prefs') {
+                add_privs('prefs.smd_user_manager', $this->privs);
+            } elseif ($event === 'plugin_prefs.smd_user_manager') {
+                add_privs('plugin_prefs.smd_user_manager', $this->privs);
+            } elseif ($event === $this->event) {
+                add_privs($this->event.'.smd_um_grp', $this->privs);
+                add_privs($this->event.'.smd_um_prv', $this->privs);
+                register_callback(array($this, 'steps'), 'user', 'steps');
+                register_callback(array($this, 'buttons'), 'user', 'controls', 'panel');
+                register_callback(array($this, 'groups'), 'admin', 'smd_um_groups', 1);
+                register_callback(array($this, 'group_add'), 'admin', 'smd_um_group_add', 1);
+                register_callback(array($this, 'group_del'), 'admin', 'smd_um_group_del', 1);
+                register_callback(array($this, 'group_save'), 'admin', 'smd_um_group_save', 1);
+                register_callback(array($this, 'privs'), 'admin', 'smd_um_privs', 1);
+                register_callback(array($this, 'priv_add'), 'admin', 'smd_um_priv_add', 1);
+                register_callback(array($this, 'priv_save'), 'admin', 'smd_um_priv_save', 1);
+            }
 
-        add_privs($this->event.'.smd_um_active', $this->privs);
-        register_callback(array($this, 'welcome'), 'plugin_lifecycle.smd_user_manager');
-        register_callback(array($this, 'options'), 'plugin_prefs.smd_user_manager', null, 1);
-        register_callback(array($this, 'inject_css'), 'admin_side', 'head_end');
-        $has_footer = callback_handlers('admin_side', 'footer');
+            add_privs($this->event.'.smd_um_active', $this->privs);
+            register_callback(array($this, 'welcome'), 'plugin_lifecycle.smd_user_manager');
+            register_callback(array($this, 'options'), 'plugin_prefs.smd_user_manager', null, 1);
+            register_callback(array($this, 'inject_css'), 'admin_side', 'head_end');
+            $has_footer = callback_handlers('admin_side', 'footer');
 
-        if (has_privs($this->event.'.smd_um_active') && !in_array(__CLASS__.'->active_users', $has_footer)) {
-            register_callback(array($this, 'active_users'), 'admin_side', 'footer');
+            if (has_privs($this->event.'.smd_um_active') && !in_array(__CLASS__.'->active_users', $has_footer)) {
+                register_callback(array($this, 'active_users'), 'admin_side', 'footer');
+            }
         }
 
         // Call the installer in case the lifecycle event didn't fire.
