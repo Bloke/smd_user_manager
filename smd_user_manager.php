@@ -217,14 +217,6 @@ if (!defined('txpinterface'))
 
 use \Textpattern\Search\Filter;
 
-if (!defined('SMD_UM_PRIVS')) {
-    define("SMD_UM_PRIVS", 'smd_um_privs');
-}
-
-if (!defined('SMD_UM_GROUPS')) {
-    define("SMD_UM_GROUPS", 'smd_um_groups');
-}
-
 if (txpinterface === 'admin') {
     new smd_um();
 }
@@ -272,7 +264,7 @@ function smd_um_has_privs($atts, $thing = null)
         foreach ($groups as $grp) {
             if ((strpos($grp, '>') === 0) || (strpos($grp, '<') === 0)) {
                 if (!isset($smd_um_groups)) {
-                    $smd_um_groups = safe_column('id', SMD_UM_GROUPS, '1=1 ORDER BY id');
+                    $smd_um_groups = safe_column('id', 'smd_um_groups', '1=1 ORDER BY id');
                 }
 
                 $val = substr($grp, 1);
@@ -311,7 +303,7 @@ function smd_um_has_privs($atts, $thing = null)
             // TODO: would be nice to do this in one query somehow
             foreach ($areas as $place) {
                 if (!isset($smd_um_permissions[$place])) {
-                    $prv = safe_field('GROUP_CONCAT(priv) AS privs', SMD_UM_PRIVS, "area = '" . doSlash($place) . "'");
+                    $prv = safe_field('GROUP_CONCAT(priv) AS privs', 'smd_um_privs', "area = '" . doSlash($place) . "'");
                     $smd_um_permissions[$place] = $prv;
                 }
 
@@ -570,7 +562,7 @@ class smd_um
         $name = ($name == '') ? strtolower(sanitizeForUrl($title)) : $name;
 
         if ($name) {
-            $exists = safe_field('id', SMD_UM_GROUPS, "name='".doSlash($name)."'");
+            $exists = safe_field('id', 'smd_um_groups', "name='".doSlash($name)."'");
 
             if ($exists) {
                 $this->message = array(gTxt('smd_um_grp_exists', array('{id}' => $exists)), E_USER_WARNING);
@@ -578,9 +570,9 @@ class smd_um
                 // It's not atomic but it'll do, given that:
                 //  a) normally only one person administers this plugin.
                 //  b) groups are added one at a time.
-                $curr_max = safe_field("MAX(id)", SMD_UM_GROUPS, '1=1');
+                $curr_max = safe_field("MAX(id)", 'smd_um_groups', '1=1');
                 $new_priv = ($curr_max + 1);
-                safe_insert(SMD_UM_GROUPS, "id='" . $new_priv . "', name='" . doSlash($name) . "'");
+                safe_insert('smd_um_groups', "id='" . $new_priv . "', name='" . doSlash($name) . "'");
                 $this->upsert_lang($title, $name);
 
                 $based_on = ps('smd_um_new_grp_based_on');
@@ -594,7 +586,7 @@ class smd_um
                         $safe_area = doSlash($area);
 
                         if (in_array($based_on, $privs, true)) {
-                            $current_privs = safe_column('priv', SMD_UM_PRIVS, "area='{$safe_area}'");
+                            $current_privs = safe_column('priv', 'smd_um_privs', "area='{$safe_area}'");
 
                             if (empty($current_privs)) {
                                 $priv_set = array_unique(array_merge($privs, array($new_priv)));
@@ -603,7 +595,7 @@ class smd_um
                             }
 
                             foreach ($priv_set as $np) {
-                                safe_insert(SMD_UM_PRIVS, "area='{$safe_area}', priv='" . doSlash($np) . "'");
+                                safe_insert('smd_um_privs', "area='{$safe_area}', priv='" . doSlash($np) . "'");
                             }
                         }
                     }
@@ -629,11 +621,11 @@ class smd_um
         require_privs($this->event.'.smd_um_grp');
 
         $id = assert_int(gps('id'));
-        $name = safe_field('name', SMD_UM_GROUPS, "id='".$id."' AND core!=1");
+        $name = safe_field('name', 'smd_um_groups', "id='".$id."' AND core!=1");
 
         if ($name) {
             // @todo Make atomic.
-            $red = safe_delete(SMD_UM_GROUPS, "id=$id AND core!=1");
+            $red = safe_delete('smd_um_groups', "id=$id AND core!=1");
             safe_delete('txp_lang', "name='".doSlash($name)."'");
             $affected_users = safe_column('user_id', 'txp_users', "privs = $id");
 
@@ -643,7 +635,7 @@ class smd_um
             }
 
             if ($red) {
-                $ret = safe_delete(SMD_UM_PRIVS, "priv=$id");
+                $ret = safe_delete('smd_um_privs', "priv=$id");
                 $this->message = gTxt('smd_um_grp_deleted') . ($affected_users ? gTxt('smd_um_grp_affected', array('{num}' => count($affected_users))) : '');
             }
         } else {
@@ -674,7 +666,7 @@ class smd_um
 
             // Can't create duplicate types
             if (!in_array($name, $excluded)) {
-                safe_update(SMD_UM_GROUPS, "name='" . doSlash($name) . "'", "id='" . doSlash($id) . "'");
+                safe_update('smd_um_groups', "name='" . doSlash($name) . "'", "id='" . doSlash($id) . "'");
             }
 
             $this->upsert_lang($title, $name);
@@ -796,7 +788,7 @@ class smd_um
             $area = strtolower(sanitizeForPage($area));
             $safe_area = doSlash($area);
 
-            $current_privs = safe_column('priv', SMD_UM_PRIVS, "area='{$safe_area}'");
+            $current_privs = safe_column('priv', 'smd_um_privs', "area='{$safe_area}'");
             $default_privs = isset($txp_permissions[$area]) ? do_list($txp_permissions[$area]) : array();
             $diff_added = array_diff($privs, $default_privs);
             $diff_removed = array_diff($current_privs, $privs);
@@ -804,7 +796,7 @@ class smd_um
             // Only alter privs if they differ from what's already stored.
             if ($diff_added || $diff_removed) {
                 // Delete the old area privs if they exist.
-                safe_delete(SMD_UM_PRIVS, "area='{$safe_area}'");
+                safe_delete('smd_um_privs', "area='{$safe_area}'");
 
                 if (is_array($privs)) {
                     foreach ($privs as $priv) {
@@ -814,7 +806,7 @@ class smd_um
                             break;
                         } else {
                             assert_int($priv);
-                            safe_insert(SMD_UM_PRIVS, "area='{$safe_area}', priv='" . doSlash($priv) . "'");
+                            safe_insert('smd_um_privs', "area='{$safe_area}', priv='" . doSlash($priv) . "'");
                         }
                     }
                 }
@@ -851,7 +843,7 @@ class smd_um
                 if ($exists) {
                     $this->message = array(gTxt('smd_um_prv_exists'), E_USER_WARNING);
                 } else {
-                    safe_insert(SMD_UM_PRIVS, "area='" . doSlash($name) . "'");
+                    safe_insert('smd_um_privs', "area='" . doSlash($name) . "'");
 
                     $this->priv_merge(false, true);
                     $this->message = gTxt('smd_um_prv_created', array('{area}' => $name));
@@ -1111,8 +1103,8 @@ EOJS
 
         $smd_um_prefs = $this->get_prefs();
 
-        if ($do_grp && $this->table_exist(SMD_UM_GROUPS)) {
-            $new_groups = safe_rows('id, name', SMD_UM_GROUPS, '1=1');
+        if ($do_grp && $this->table_exist('smd_um_groups')) {
+            $new_groups = safe_rows('id, name', 'smd_um_groups', '1=1');
 
             $txp_groups = $replace ? array() : $txp_groups;
 
@@ -1123,8 +1115,8 @@ EOJS
             ksort($txp_groups);
         }
 
-        if ($do_priv && $this->table_exist(SMD_UM_PRIVS)) {
-            $new_privs = safe_rows('area, GROUP_CONCAT(priv) AS privs', SMD_UM_PRIVS, '1=1 GROUP BY area ORDER BY area');
+        if ($do_priv && $this->table_exist('smd_um_privs')) {
+            $new_privs = safe_rows('area, GROUP_CONCAT(priv) AS privs', 'smd_um_privs', '1=1 GROUP BY area ORDER BY area');
 
             // Allow this plugin's strings to be skipped if we don't want people upsetting the plugin's behaviour.
             $self_edit = get_pref('smd_um_self_alter', $smd_um_prefs['smd_um_self_alter']['default']);
@@ -1226,9 +1218,9 @@ EOJS
         $tiered = get_pref('smd_um_hierarchical_groups', $smd_um_prefs['smd_um_hierarchical_groups']['default']);
         $curr_priv = safe_field('privs', 'txp_users', "name = '" .doSlash($txp_user). "'");
 
-        if ($this->table_exist(SMD_UM_GROUPS)) {
+        if ($this->table_exist('smd_um_groups')) {
             $protected = get_pref('smd_um_admin_group', $smd_um_prefs['smd_um_admin_group']['default']);
-            $grp = safe_rows('id, name', SMD_UM_GROUPS, '1=1');
+            $grp = safe_rows('id, name', 'smd_um_groups', '1=1');
 
             foreach ($grp as $row) {
                 if ($protected && ($row['id'] == $protected) && ($curr_priv != $protected) ) {
@@ -1272,7 +1264,7 @@ EOJS
             // In truth, this table should be normalised further, but for the sake
             // of one row per priv level per area, it's quicker than a join, and
             // using GROUP_CONCAT() gets the priv table as in admin.config.php
-            $sql[] = "CREATE TABLE IF NOT EXISTS `".PFX.SMD_UM_PRIVS."` (
+            $sql[] = "CREATE TABLE IF NOT EXISTS `".PFX."smd_um_privs` (
                 `area` varchar(127) NOT NULL default '',
                 `priv` smallint NOT NULL default 0,
                 PRIMARY KEY (`area`,`priv`)
@@ -1280,7 +1272,7 @@ EOJS
 
             // id is NOT an auto_increment column because autoinc doesn't allow
             // a 0 entry, which we need for 'None'
-            $sql[] = "CREATE TABLE IF NOT EXISTS `".PFX.SMD_UM_GROUPS."` (
+            $sql[] = "CREATE TABLE IF NOT EXISTS `".PFX."smd_um_groups` (
                 `id` smallint(4) NOT NULL default 0,
                 `name` varchar(64) NOT NULL default '',
                 `core` bool NOT NULL default 0,
@@ -1288,28 +1280,28 @@ EOJS
             ) ENGINE=MyISAM PACK_KEYS=1";
 
             // Handle upgrades: be kind to beta testers.
-            if ($this->table_exist(SMD_UM_PRIVS)) {
-                $flds = getThings('SHOW COLUMNS FROM `'.PFX.SMD_UM_PRIVS.'`');
+            if ($this->table_exist('smd_um_privs')) {
+                $flds = getThings('SHOW COLUMNS FROM `'.PFX.'smd_um_privs`');
 
                 if (in_array('core', $flds)) {
-                    $sql[] = "ALTER TABLE `".PFX.SMD_UM_PRIVS."` DROP `core`";
+                    $sql[] = "ALTER TABLE `".PFX."smd_um_privs` DROP `core`";
                 }
             }
 
             // Append initial value population to query stack if this is a new install.
-            if (!$this->table_exist(SMD_UM_GROUPS)) {
+            if (!$this->table_exist('smd_um_groups')) {
                 foreach ($txp_groups as $id => $name) {
-                    $sql[] = "INSERT INTO `".PFX.SMD_UM_GROUPS."` VALUES ('$id', '$name', 1)";
+                    $sql[] = "INSERT INTO `".PFX."smd_um_groups` VALUES ('$id', '$name', 1)";
                 }
             }
 
-            if (!$this->table_exist(SMD_UM_PRIVS)) {
+            if (!$this->table_exist('smd_um_privs')) {
                 foreach ($txp_permissions as $area => $privs) {
                     $priv_list = do_list($privs);
 
                     foreach ($priv_list as $priv) {
                         if (is_numeric($priv)) {
-                            $sql[] = "INSERT INTO `".PFX.SMD_UM_PRIVS."` VALUES ('$area', '$priv')";
+                            $sql[] = "INSERT INTO `".PFX."smd_um_privs` VALUES ('$area', '$priv')";
                         }
                     }
                 }
@@ -1383,8 +1375,8 @@ EOJS
 
         if ($this->table_exist(1)) {
 
-            $sql[] = "DROP TABLE IF EXISTS " .PFX.SMD_UM_PRIVS. "; ";
-            $sql[] = "DROP TABLE IF EXISTS " .PFX.SMD_UM_GROUPS. "; ";
+            $sql[] = "DROP TABLE IF EXISTS " .PFX. "smd_um_privs; ";
+            $sql[] = "DROP TABLE IF EXISTS " .PFX. "smd_um_groups; ";
 
             if (gps('debug')) {
                 dmp($sql);
@@ -1433,8 +1425,8 @@ EOJS
 
         // The number of expected cols in each table.
         $tbls = array(
-            SMD_UM_GROUPS => 3,
-            SMD_UM_PRIVS => 2,
+            'smd_um_groups' => 3,
+            'smd_um_privs' => 2,
         );
 
         if ($which && array_key_exists($which, $tbls) && isset($smd_um_installed[$which])) {
