@@ -10,7 +10,7 @@
     "source": "https://github.com/bloke/smd_user_manager"
   },
   "require": {
-    "textpattern/lock": ">=4.8.6",
+    "textpattern/lock": ">=4.9.0",
     "textpattern/installer": "*"
   }
 }

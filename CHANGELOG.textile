@@ -1,5 +1,15 @@
 h1. Changelog
 
+h2. 0.4.0 - 2026-10-21
+
+* For Txp 4.9.0+ only.
+* Give access to group/priv info on public site.
+* Drop use of define() table names. They serve no purpose beyond clouding the global scope.
+* Permit new groups based on the None role.
+* Remove asset count columns, since they're handled natively by 4.9.0+ now.
+* Move user count tooltip to its own column on Groups panel.
+* Fix PHP 8 warnings.
+
 h2. 0.3.0 - 2023-02-27
 
 * Complete rewrite for Textpattern 4.8.6+.

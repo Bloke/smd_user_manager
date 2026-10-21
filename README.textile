@@ -15,7 +15,7 @@ Complete user / group / privilege management. Features:
 
 h2. Installation / uninstallation
 
-p(important). Requires Txp 4.8.6+
+p(important). Requires Txp 4.9.0+
 
 Download the plugin from either "the Textpattern plugins repo":https://plugins.textpattern.com/plugins/smd_user_manager, "GitHub":https://github.com/Bloke/smd_user_manager, or "my software page":https://stefdawson.com/sw, paste the code into the Txp _Admin->Plugins_ panel, install and enable the plugin. The tables will be installed and populated automatically unless you use the plugin from the cache directory; in either case, visiting the _Admin->User manager_ tab will install and populate them.
 
@@ -54,7 +54,7 @@ You may also add a new group using the input controls and accompanying _Create_ 
 
 Custom groups can be deleted using the 'x' button alongside each. Any users that were assigned to that group will have their privileges reduced to 'None'. Either visit the _Users_ panel and alter their priv level to something suitable, or set their level to something else prior to deleting the group.
 
-If any group contains at least one user, the group ID values are hyperlinked back to the Users panel to show only those users in that group. This is handy for reassigning priv levels before deleting a group. If you hover over the priv ID, a tooltip will display the number of users assigned to that privilege group.
+If any group contains at least one user, the group ID values are hyperlinked back to the Users panel to show only those users in that group. This is handy for reassigning priv levels before deleting a group. The number of users assigned to that privilege group is also shown in the table.
 
 h2(#smd_um_privs). Priv management (_Privs_ button)
 

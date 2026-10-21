@@ -95,7 +95,7 @@ smd_um_tbl_installed => Tables installed
 smd_um_tbl_not_installed => Tables not installed
 smd_um_tbl_not_removed => Tables not removed
 smd_um_tbl_removed => Tables removed
-smd_um_user_count => Users in this group:
+smd_um_user_count => Number of users
 smd_um_usr_lbl => Users
 #@prefs
 smd_user_manager => User manager
@@ -141,7 +141,7 @@ smd_um_tbl_installed => Tables installées
 smd_um_tbl_not_installed => Tables non installées
 smd_um_tbl_not_removed => Tables non supprimées
 smd_um_tbl_removed => Tables supprimées
-smd_um_user_count => Utilisateurs de ce groupe :&nbsp;
+smd_um_user_count => Nombre d'utilisateurs
 smd_um_usr_lbl => Utilisateurs
 #@prefs
 smd_um_active_timeout => Durée d'activité (secondes)
@@ -186,7 +186,7 @@ smd_um_tbl_installed => Tablas instaladas
 smd_um_tbl_not_installed => Tablas no instaladas
 smd_um_tbl_not_removed => Tablas no eliminadas
 smd_um_tbl_removed => Tablas eliminadas
-smd_um_user_count => Usuarios en este grupo:
+smd_um_user_count => Número de usuarios
 smd_um_usr_lbl => Usuarios
 #@prefs
 smd_um_active_timeout => Desconectar a los usuarios después de (segundos)
@@ -732,6 +732,7 @@ class smd_um
                     hCell('ID', '', ' class="id"').
                     hCell(gTxt('title'), '', ' class="name"').
                     hCell(gTxt('name'), '', ' class="name"').
+                    hCell(gTxt('smd_um_user_count')).
                     hCell('', '', '')
                 )
                 .n. '</thead>'
@@ -739,17 +740,17 @@ class smd_um
 
             foreach ($rs as $row) {
                 extract(doSpecial($row));
-                $user_count = empty($user_count) ? 0 : $user_count;
+                $user_count = empty($user_count) ? 0 : (int)$user_count;
                 $dLink = ($core) ? '&nbsp;' : dLink($this->event, 'smd_um_group_del', 'id', $id, false, '', '', true);
                 echo tr(
                     tda(
                         hInput('smd_um_group_id[]', $id)
                         .(($user_count) ? eLink($this->event, '', 'search_method', 'privs', $id, 'crit', $id) : $id)
                     , ' class="id"'
-                        .(($user_count) ? ' title="' . gTxt('smd_um_user_count') . $user_count . '"': '')
                     )
                     .td(fInput('text', 'smd_um_group_title[]', gTxt($name)), '', 'name')
                     .td(fInput('text', 'smd_um_group_name[]', $name), '', 'name')
+                    .td($user_count)
                     .td($dLink)
                 );
             }
@@ -1539,7 +1540,7 @@ Complete user / group / privilege management. Features:
 
 h2. Installation / uninstallation
 
-p(important). Requires Txp 4.8.6+
+p(important). Requires Txp 4.9.0+
 
 Download the plugin from either "the Textpattern plugins repo":https://plugins.textpattern.com/plugins/smd_user_manager, "GitHub":https://github.com/Bloke/smd_user_manager, or "my software page":https://stefdawson.com/sw, paste the code into the Txp _Admin->Plugins_ panel, install and enable the plugin. The tables will be installed and populated automatically unless you use the plugin from the cache directory; in either case, visiting the _Admin->User manager_ tab will install and populate them.
 
@@ -1578,7 +1579,7 @@ You may also add a new group using the input controls and accompanying _Create_ 
 
 Custom groups can be deleted using the 'x' button alongside each. Any users that were assigned to that group will have their privileges reduced to 'None'. Either visit the _Users_ panel and alter their priv level to something suitable, or set their level to something else prior to deleting the group.
 
-If any group contains at least one user, the group ID values are hyperlinked back to the Users panel to show only those users in that group. This is handy for reassigning priv levels before deleting a group. If you hover over the priv ID, a tooltip will display the number of users assigned to that privilege group.
+If any group contains at least one user, the group ID values are hyperlinked back to the Users panel to show only those users in that group. This is handy for reassigning priv levels before deleting a group. The number of users assigned to that privilege group is also shown in the table.
 
 h2(#smd_um_privs). Priv management (_Privs_ button)
 
