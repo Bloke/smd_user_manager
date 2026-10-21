@@ -95,7 +95,7 @@ smd_um_tbl_installed => Tables installed
 smd_um_tbl_not_installed => Tables not installed
 smd_um_tbl_not_removed => Tables not removed
 smd_um_tbl_removed => Tables removed
-smd_um_user_count => Users in this group: 
+smd_um_user_count => Users in this group:
 smd_um_usr_lbl => Users
 #@prefs
 smd_user_manager => User manager
@@ -234,7 +234,7 @@ if (class_exists('\Textpattern\Tag\Registry')) {
  * @param array  $atts  Tag attributes
  * @param string $thing Tag container content
  */
-function smd_um_has_privs($atts, $thing = null)
+function smd_um_has_privs($atts, $thing = '')
 {
     global $txp_user;
     static $smd_um_permissions;
@@ -414,7 +414,7 @@ class smd_um
 
             add_privs($this->event.'.smd_um_active', $this->privs);
             register_callback(array($this, 'welcome'), 'plugin_lifecycle.smd_user_manager');
-            register_callback(array($this, 'options'), 'plugin_prefs.smd_user_manager', null, 1);
+            register_callback(array($this, 'options'), 'plugin_prefs.smd_user_manager', '', 1);
             register_callback(array($this, 'inject_css'), 'admin_side', 'head_end');
             $has_footer = callback_handlers('admin_side', 'footer');
 
@@ -740,7 +740,7 @@ class smd_um
             foreach ($rs as $row) {
                 extract(doSpecial($row));
                 $user_count = empty($user_count) ? 0 : $user_count;
-                $dLink = ($core) ? '&nbsp;' : dLink($this->event, 'smd_um_group_del', 'id', $id, false, null, null, true);
+                $dLink = ($core) ? '&nbsp;' : dLink($this->event, 'smd_um_group_del', 'id', $id, false, '', '', true);
                 echo tr(
                     tda(
                         hInput('smd_um_group_id[]', $id)
@@ -1078,7 +1078,7 @@ EOJS
         global $step;
 
         if (strpos($step, 'smd_um_') === 0 && has_privs('admin.edit')) {
-            $buttons[] = sLink($this->event, null, gTxt('tab_site_admin'), 'txp-button');
+            $buttons[] = sLink($this->event, '', gTxt('tab_site_admin'), 'txp-button');
         }
 
         if (has_privs($this->event.'.smd_um_grp')) {
@@ -1439,7 +1439,7 @@ EOJS
             foreach ($tbls as $tbl => $cols) {
                 $res = mysqli_query($DB->link, "SHOW TABLES LIKE '".PFX.$tbl."'");
 
-                if (mysqli_fetch_row($res) !== NULL) {
+                if (mysqli_fetch_row($res) !== null) {
                     $num = count(safe_show('columns', $tbl));
                     $smd_um_installed[$tbl] = $num;
                     $out -= ($tbls[$tbl] == $num) ? 1 : 0;
@@ -1450,7 +1450,7 @@ EOJS
         } elseif (array_key_exists($which, $tbls)) {
             $res = mysqli_query($DB->link, "SHOW TABLES LIKE '".PFX.$which."'");
 
-            if (mysqli_fetch_row($res) !== NULL) {
+            if (mysqli_fetch_row($res) !== null) {
                 $num = count(safe_show('columns', $which));
                 $smd_um_installed[$which] = $num;
 
